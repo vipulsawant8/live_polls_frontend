@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPolls, selectAllPolls } from "@/app/features/poll/pollSlice.js";
 import { Link } from "react-router";
-import { Card, CardBody, Row, Col, CardTitle, Container, Button, Badge, } from "react-bootstrap";
+import { Card, CardBody, Row, Col, CardTitle, Container, Button, Badge } from "react-bootstrap";
 import { Person, Award } from "react-bootstrap-icons";
 
 import AddPoll from "@/components/poll/AddPoll.jsx";
