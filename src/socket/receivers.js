@@ -1,6 +1,7 @@
 import POLL_EVENTS from "@/socket/events.js";
-import { socketUpdatePoll, /* voteAcceptedMessage, voteRejectedMessage,*/ setMessage /*, socketClosePoll*/ } from "@/app/features/poll/pollSlice.js";
+import { socketUpdatePoll, /* voteAcceptedMessage, voteRejectedMessage,*/ setMessage /*, socketClosePoll*/, selectPollByID } from "../app/features/poll/pollSlice.js";
 import notify from "@/utils/notify.js";
+import { useSelector } from "react-redux";
 
 const registerPollReceivers = (socket, dispatch) => {
 
@@ -21,6 +22,8 @@ const registerPollReceivers = (socket, dispatch) => {
 	});
 
 	socket.on(POLL_EVENTS.POLL_CLOSED, ({ pollID }) => {
+		const poll = useSelector(selectPollByID(pollID));
+		dispatch(socketUpdatePoll({ ...poll, open: false }));
 		dispatch(setMessage({ type: "danger", message: "Poll Closed or Expired" }));
 		notify.error("Poll Closed or Expired");
 	});
@@ -30,6 +33,7 @@ const registerPollReceivers = (socket, dispatch) => {
 	});
 	
 	socket.on(POLL_EVENTS.CLOSE_POLL, ({ poll, name }) => {
+		dispatch(socketUpdatePoll(poll));
 		dispatch(setMessage({ type: "success", message: `Poll "${poll.title}" closed by owner ${name}` }));
 		notify.success(`Poll "${poll.title}" closed by owner ${name}`);
 	});

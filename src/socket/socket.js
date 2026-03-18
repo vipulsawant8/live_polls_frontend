@@ -16,6 +16,8 @@ const initSocket = () => {
 	if (socket && socket.connected) return socket;
 
 	socket = io(SOCKET_URL, socketOptions);
+
+  // Case 1: Error during connection
 	socket.on("connect_error", async (err) => {
 		if (err.message === "jwt expired" || err.message === "Unauthorized") {
 			try {
@@ -26,7 +28,22 @@ const initSocket = () => {
 			}
 		}
 	});
-	
+
+  // ✅ Case 2: Token expires AFTER connection
+  socket.on("disconnect", async (reason) => {
+    console.log("Socket disconnected:", reason);
+
+    if (reason === "io server disconnect") {
+      try {
+        await API.post("/auth/refresh-token");
+
+        // IMPORTANT: manually reconnect
+        socket.connect();
+      } catch (error) {
+        console.error("Reconnection failed after token expiry");
+      }
+    }
+  });
 
   if (!socket.connected) {
     socket.connect();
